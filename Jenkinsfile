@@ -7,23 +7,23 @@ pipeline{
                  echo 'github url checkout'
             }
         }
-        stage('codecompile with akshat'){
+        stage('codecompile'){
             steps{
                 echo 'starting compiling'
                 sh 'mvn compile'
             }
         }
-        stage('codetesting with akshat'){
+        stage('codetesting'){
             steps{
                 sh 'mvn test'
             }
         }
-        stage('qa with akshat'){
+        stage('qa'){
             steps{
                 sh 'mvn checkstyle:checkstyle'
             }
         }
-        stage('package with akshat'){
+        stage('package'){
             steps{
                 sh 'mvn package'
             }
@@ -38,7 +38,7 @@ pipeline{
          
          stage('port expose and container creation'){
           steps{
-               sh 'docker run -itd -p 8091:8082 --name HEALTHCARE_CONTAINER myimg'
+               sh 'docker run -itd -p 8091:8082 --name My-container myimg'
            }
          }
          
