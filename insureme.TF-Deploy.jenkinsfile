@@ -1,0 +1,30 @@
+pipeline{
+    agent any
+    stages{
+        stage('checkout the code from github'){
+            steps{
+                 git url: 'https://github.com/Gokul-9248/star-agile-insurance-project.git', branch:"master"
+                 echo 'github url checkout'
+            }
+        }
+        
+        stage('Terraform Init'){
+            steps{
+                sh 'terraform init'
+            }
+        }
+        
+            
+        stage('Terraform Plan'){
+            steps{
+                sh 'terraform plan'
+            }
+        }
+                
+        stage('Terraform apply'){
+            steps{
+                sh 'terraform apply -auto-approve'
+            }
+        }
+    }
+}
