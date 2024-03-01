@@ -1,0 +1,60 @@
+pipeline{
+    agent any
+    stages{
+        stage('checkout the code from github'){
+            steps{
+                 git url: 'https://github.com/Gokul-9248/star-agile-insurance-project.git', branch:"master"
+                 echo 'github url checkout'
+            }
+        }
+        
+        stage('code compile'){
+            steps{
+                echo 'starting compiling'
+                sh 'mvn compile'
+            }
+        }
+        
+        stage('codetesting'){
+            steps{
+                sh 'mvn test'
+            }
+        }
+        stage('qa'){
+            steps{
+                sh 'mvn checkstyle:checkstyle'
+            }
+        }
+        stage('package'){
+            steps{
+                sh 'mvn clean package'
+            }
+        }
+        
+         stage('HTML Report'){
+            steps{
+            publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: '/var/lib/jenkins/workspace/InsureME-test_server/target/surefire-reports', reportFiles: 'index.html', reportName: 'HTML Report', reportTitles: '', useWrapperFileDirectly: true])
+            }
+        }
+        stage('Building docker image'){
+            steps{
+                sh 'docker build -t gokul1311/insureme:1.0 . '
+            }
+        }
+        
+        stage('Dockerhub login and image pushing'){
+            steps{
+                withCredentials([string(credentialsId: 'dockerhubpass', variable: 'dockerhubpass')]) {
+                    sh " docker login -u gokul1311 -p ${dockerhubpass}"
+                    sh "docker push gokul1311/insureme:1.0"
+                }
+            }
+        }
+        stage('ansible deployment'){
+            steps{
+                ansiblePlaybook become: true, credentialsId: 'ansible', disableHostKeyChecking: true, installation: 'ansible', inventory: '/etc/ansible/hosts', playbook: 'ansible-playbook.yml', vaultTmpPath: ''
+            }
+        }
+        
+    }
+}
